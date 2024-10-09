@@ -7,11 +7,13 @@ import com.libraryAPI.project.domain.entities.AuthorEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 public interface ServiceAuthors {
 
     AuthorEntity createAuthor(AuthorEntity author);
 
 
-
+    List<AuthorEntity> findAll();
 }

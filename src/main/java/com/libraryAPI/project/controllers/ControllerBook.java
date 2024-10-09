@@ -2,7 +2,7 @@
 //Provide endpoints for all CRUD operations (do not implement it themselves that is for the service layer)
 //So handle requests by clients and give responses (can present data/status codes/error responses...)
 
-//Mappers convert entities where DTOs will actually call and deal with them
+//All methods below return JSON automatically
 
 package com.libraryAPI.project.controllers;
 
@@ -13,10 +13,10 @@ import com.libraryAPI.project.domain.entities.BookEntity;
 import com.libraryAPI.project.map.Mapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -43,6 +43,12 @@ public class ControllerBook {
         DtoBook storedBookDTO = mapBook.mapTo(storedBook);
         return new ResponseEntity<>(storedBookDTO, HttpStatus.CREATED);
 
+    }
+
+    @GetMapping(path = "/books")
+    public List<DtoBook> returnListBooks(){
+        List<BookEntity> books = bookService.findAll();
+       return books.stream().map(mapBook::mapTo).collect(Collectors.toList());
     }
 
 }

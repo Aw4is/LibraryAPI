@@ -15,9 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class ControllerAuthor {
@@ -42,7 +46,14 @@ public class ControllerAuthor {
         AuthorEntity storedAuthorE = authorService.createAuthor(authorE);
         return new ResponseEntity<>(map.mapTo(storedAuthorE), HttpStatus.CREATED); //ensures 201 returned
 
+    }
 
+    //Returns list of authors
+    @GetMapping(path = "/authors")
+    public List<DtoAuthor> returnListAuthors(){
+        List<AuthorEntity> authorsList = authorService.findAll();
+        //Takes all author in list, convert to DTO using mapper
+        return authorsList.stream().map(map::mapTo).collect(Collectors.toList());
     }
 
 

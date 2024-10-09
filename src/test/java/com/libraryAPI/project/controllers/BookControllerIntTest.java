@@ -48,4 +48,37 @@ public class BookControllerIntTest {
 
     }
 
+    @Test
+    public void testListBookReturnsCorrectStatusCode() throws Exception {
+        //Create DTO object
+        DtoBook bookDTO = TestDataUtil.createTestBookADTO(null);
+        //Convert DTO object to json
+        String bookJson = map.writeValueAsString(bookDTO);
+
+        mvc.perform(
+                //Stimulate put request
+                MockMvcRequestBuilders.put("/books/978-1-2345-6789-0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isCreated()
+        );
+    }
+
+    @Test
+    public void testThatCreateBookReturnsCreatedBook() throws Exception {
+        DtoBook bookDTO = TestDataUtil.createTestBookADTO(null);
+        String bookJson = map.writeValueAsString(bookDTO);
+
+        mvc.perform(
+                MockMvcRequestBuilders.put("/books/978-1-2345-6789-0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.isbn").value("978-1-2345-6789-0")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.title").value("The Shadow in the Attic")
+        );
+    }
+
 }

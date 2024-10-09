@@ -2,6 +2,7 @@ package com.libraryAPI.project.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.libraryAPI.project.ServiceLayer.ServiceAuthors;
 import com.libraryAPI.project.domain.entities.AuthorEntity;
 import com.libraryAPI.project.TestDataUtil;
 import org.junit.jupiter.api.Test;
@@ -24,17 +25,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 public class AuthorControllerIntTest {
 
 
-//    private ServiceAuthors authorService;
+    private ServiceAuthors authorService;
 
     private MockMvc mvc;
 
     private ObjectMapper map;
 
     @Autowired
-    public AuthorControllerIntTest(MockMvc mockMvc){
+    public AuthorControllerIntTest(MockMvc mockMvc, ServiceAuthors authorService) {
         this.mvc = mockMvc;
         this.map = new ObjectMapper();
-//        this.authorService = author;
+        this.authorService = authorService;
     }
 
     @Test
@@ -48,7 +49,7 @@ public class AuthorControllerIntTest {
                 MockMvcRequestBuilders.post("/authors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(authorinJson)
-                ).andExpect(MockMvcResultMatchers.status().isCreated()
+        ).andExpect(MockMvcResultMatchers.status().isCreated()
         );
     }
 
@@ -60,14 +61,40 @@ public class AuthorControllerIntTest {
         //Requestbuilder post to where we map it
 
         mvc.perform(
-                MockMvcRequestBuilders.post("/authors")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(authorinJson)
-        ).andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
+                        MockMvcRequestBuilders.post("/authors")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(authorinJson)
+                ).andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Abigail Rose"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.age").value(80));
     }
 
+    @Test
+    public void testListAuthorReturnsCorrectStatusCode() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/authors")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
+    @Test
+    public void testAuthorReturnsList() throws Exception {
+        AuthorEntity authorE = TestDataUtil.createTestAuthorA();
+        authorService.createAuthor(authorE);
 
+        mvc.perform(
+                MockMvcRequestBuilders.get("/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].id").isNumber()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].name").value("Abigail Rose")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].age").value(80)
+        );
+    }
 }
+
+
+
+
+
